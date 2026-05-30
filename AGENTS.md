@@ -1,4 +1,4 @@
-# Copilot Instructions for `cvd`
+# Agent Instructions for `cvd`
 
 cvd is a LuaTeX package for color vision deficiency simulation and correction.
 
