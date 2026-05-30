@@ -221,7 +221,7 @@ function M.transform_current_color(color_str)
 	-- \current@color contains PDF color operators like
 	-- "1 0 0 rg 1 0 0 RG" in RGB or "1 0 0 0 k 1 0 0 0 K" in CMYK
 	-- Extract just the color model ("rgb" or "cmy") and the corresponding
-	-- channel values R G B or C M Y (denoted c1, c2, c3)
+	-- channel values R G B or C M Y K (denoted c1, c2, c3, c4 for CMYK where c4=K is kept unchanged)
 	local color_model = (string.match(color_str, "rg") or string.match(color_str, "RG") or 
 	                    string.match(color_str, "k") or string.match(color_str, "K"))
 	if color_model == "rg" or color_model == "RG" then
@@ -232,35 +232,72 @@ function M.transform_current_color(color_str)
 
 	local transformed = color_str
 
-	-- transform the first values (usually fill)
-	local f1, f2, f3 = string.match(color_str, "^(%d*%.?%d+)%s+(%d*%.?%d+)%s+(%d*%.?%d+)")
-	if f1 and f2 and f3 and M.enabled and M.current_type then
-		f1, f2, f3 = tonumber(f1), tonumber(f2), tonumber(f3)
-		if not f1 or not f2 or not f3 then
-			return color_str
+	-- For CMYK (k/K operators), we need 4 values (C M Y K), for RGB (rg/RG operators) we need 3 values (R G B)
+	if color_model == "cmy" then
+		-- transform the first values (usually fill) - CMYK has 4 values
+		local f1, f2, f3, f4 = string.match(color_str, "^(%d*%.?%d+)%s+(%d*%.?%d+)%s+(%d*%.?%d+)%s+(%d*%.?%d+)")
+		if f1 and f2 and f3 and f4 and M.enabled and M.current_type then
+			f1, f2, f3, f4 = tonumber(f1), tonumber(f2), tonumber(f3), tonumber(f4)
+			if not f1 or not f2 or not f3 or not f4 then
+				return color_str
+			end
+			-- Transform only C, M, Y components (first 3), keep K component (4th) unchanged
+			local f1_new, f2_new, f3_new = M.transform(color_model, f1, f2, f3)
+			-- Replace the CMYK values in the original string, preserving K
+			transformed = string.gsub(
+				color_str,
+				"^%d*%.?%d+ +%d*%.?%d+ +%d*%.?%d+ +%d*%.?%d+",
+				string.format("%.6f %.6f %.6f %s", f1_new, f2_new, f3_new, f4),
+				1
+			)
 		end
-		local f1_new, f2_new, f3_new = M.transform(color_model, f1, f2, f3)
-		-- Replace the color (RGB or CMY) values in the original string
-		transformed = string.gsub(
-			color_str,
-			"^%d*%.?%d+ +%d*%.?%d+ +%d*%.?%d+",
-			string.format("%.6f %.6f %.6f", f1_new, f2_new, f3_new),
-			1
-		)
-	end
 
-	-- check if there are more values (usually draw) and transform them as well
-	local d1, d2, d3 = string.match(transformed, " +[a-zA-Z]+%s+(%d*%.?%d+)%s+(%d*%.?%d+)%s+(%d*%.?%d+)")
-	if d1 and d2 and d3 and M.enabled and M.current_type then
-		d1, d2, d3 = tonumber(d1), tonumber(d2), tonumber(d3)
-		if not d1 or not d2 or not d3 then
-			return color_str
+		-- check if there are more values (usually draw) and transform them as well
+		local d1, d2, d3, d4 = string.match(transformed, " +[a-zA-Z]+%s+(%d*%.?%d+)%s+(%d*%.?%d+)%s+(%d*%.?%d+)%s+(%d*%.?%d+)")
+		if d1 and d2 and d3 and d4 and M.enabled and M.current_type then
+			d1, d2, d3, d4 = tonumber(d1), tonumber(d2), tonumber(d3), tonumber(d4)
+			if not d1 or not d2 or not d3 or not d4 then
+				return color_str
+			end
+			-- Transform only C, M, Y components (first 3), keep K component (4th) unchanged
+			local d1_new, d2_new, d3_new = M.transform(color_model, d1, d2, d3)
+			-- Replace the CMYK values in the original string, preserving K
+			transformed = string.gsub(transformed, " +([a-zA-Z]+) +%d*%.?%d+ +%d*%.?%d+ +%d*%.?%d+ +%d*%.?%d+", function(op)
+				return string.format(" %s %.6f %.6f %.6f %s", op, d1_new, d2_new, d3_new, d4)
+			end, 1)
 		end
-		local d1_new, d2_new, d3_new = M.transform(color_model, d1, d2, d3)
-		-- Replace the color (RGB or CMY) values in the original string
-		transformed = string.gsub(transformed, " +([a-zA-Z]+) +%d*%.?%d+ +%d*%.?%d+ +%d*%.?%d+", function(op)
-			return string.format(" %s %.6f %.6f %.6f", op, d1_new, d2_new, d3_new)
-		end, 1)
+	else
+		-- RGB color model - 3 values
+		-- transform the first values (usually fill)
+		local f1, f2, f3 = string.match(color_str, "^(%d*%.?%d+)%s+(%d*%.?%d+)%s+(%d*%.?%d+)")
+		if f1 and f2 and f3 and M.enabled and M.current_type then
+			f1, f2, f3 = tonumber(f1), tonumber(f2), tonumber(f3)
+			if not f1 or not f2 or not f3 then
+				return color_str
+			end
+			local f1_new, f2_new, f3_new = M.transform(color_model, f1, f2, f3)
+			-- Replace the RGB values in the original string
+			transformed = string.gsub(
+				color_str,
+				"^%d*%.?%d+ +%d*%.?%d+ +%d*%.?%d+",
+				string.format("%.6f %.6f %.6f", f1_new, f2_new, f3_new),
+				1
+			)
+		end
+
+		-- check if there are more values (usually draw) and transform them as well
+		local d1, d2, d3 = string.match(transformed, " +[a-zA-Z]+%s+(%d*%.?%d+)%s+(%d*%.?%d+)%s+(%d*%.?%d+)")
+		if d1 and d2 and d3 and M.enabled and M.current_type then
+			d1, d2, d3 = tonumber(d1), tonumber(d2), tonumber(d3)
+			if not d1 or not d2 or not d3 then
+				return color_str
+			end
+			local d1_new, d2_new, d3_new = M.transform(color_model, d1, d2, d3)
+			-- Replace the RGB values in the original string
+			transformed = string.gsub(transformed, " +([a-zA-Z]+) +%d*%.?%d+ +%d*%.?%d+ +%d*%.?%d+", function(op)
+				return string.format(" %s %.6f %.6f %.6f", op, d1_new, d2_new, d3_new)
+			end, 1)
+		end
 	end
 
 	return transformed
@@ -292,20 +329,46 @@ function M.process_pdf_image_content(stream)
 
 	-- Transform colors for any of the supported operators
 	-- Match after space or line start, require non-letter after operator to avoid matching to text
+	
+	-- Handle CMYK with 4 values (C M Y K) first
 	stream = string.gsub(
 		stream,
-		"([^a-zA-Z%d.])(%d*%.?%d+)%s(%d*%.?%d+)%s(%d*%.?%d+)%s([a-zA-Z]+)([^a-zA-Z%d.])",
+		"([^a-zA-Z%d.])(%d*%.?%d+)%s(%d*%.?%d+)%s(%d*%.?%d+)%s(%d*%.?%d+)%s([kK])([^a-zA-Z%d.])",
+		function(prefix, c1, c2, c3, c4, op, suffix)
+			local color_model = "cmy"
+			local c1_str, c2_str, c3_str, c4_str = c1, c2, c3, c4
+			c1, c2, c3 = tonumber(c1), tonumber(c2), tonumber(c3)
+			if c1 and c2 and c3 and c1 >= 0 and c1 <= 1 and c2 >= 0 and c2 <= 1 and c3 >= 0 and c3 <= 1 then
+				local c1_new, c2_new, c3_new = M.transform(color_model, c1, c2, c3)
+				if
+					math.abs(c1_new - c1) < 0.000001
+					and math.abs(c2_new - c2) < 0.000001
+					and math.abs(c3_new - c3) < 0.000001
+				then
+					return prefix .. c1_str .. " " .. c2_str .. " " .. c3_str .. " " .. c4_str .. " " .. op .. suffix
+				end
+				return string.format(
+					"%s%s %s %s %s %s%s",
+					prefix,
+					format_short(c1_new),
+					format_short(c2_new),
+					format_short(c3_new),
+					c4_str,
+					op,
+					suffix
+				)
+			end
+			return prefix .. c1_str .. " " .. c2_str .. " " .. c3_str .. " " .. c4_str .. " " .. op .. suffix
+		end
+	)
+	
+	-- Handle RGB with 3 values
+	stream = string.gsub(
+		stream,
+		"([^a-zA-Z%d.])(%d*%.?%d+)%s(%d*%.?%d+)%s(%d*%.?%d+)%s([rR][gG])([^a-zA-Z%d.])",
 		function(prefix, c1, c2, c3, op, suffix)
-			local color_model = ""
-			if op:lower() == "rg" then
-				color_model = "rgb"
-			elseif op:lower() == "k" then
-				color_model = "cmy"
-			end
+			local color_model = "rgb"
 			local c1_str, c2_str, c3_str = c1, c2, c3
-			if color_model == "" then
-				return prefix .. c1_str .. " " .. c2_str .. " " .. c3_str .. " " .. op .. suffix
-			end
 			c1, c2, c3 = tonumber(c1), tonumber(c2), tonumber(c3)
 			if c1 and c2 and c3 and c1 >= 0 and c1 <= 1 and c2 >= 0 and c2 <= 1 and c3 >= 0 and c3 <= 1 then
 				local c1_new, c2_new, c3_new = M.transform(color_model, c1, c2, c3)

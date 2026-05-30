@@ -74,8 +74,8 @@ local tests = {
 			cvd.set_severity(1.0)
 			cvd.enable()
 
-			local out = cvd.transform_current_color("0 1 0 k")
-			support.assert_equal(out, "0.256394 0.174226 0.160300 k", "unexpected transformed cmyk value")
+			local out = cvd.transform_current_color("0 1 0 0 k")
+			support.assert_equal(out, "0.256394 0.174226 0.160300 0 k", "unexpected transformed cmyk value")
 		end,
 	},
 	{
@@ -86,8 +86,8 @@ local tests = {
 			cvd.set_severity(1.0)
 			cvd.enable()
 
-			local out = cvd.transform_current_color("1 0 0 K")
-			support.assert_equal(out, "0.998143 0.074525 0.000000 K", "unexpected transformed CMYK value with uppercase K")
+			local out = cvd.transform_current_color("1 0 0 0 K")
+			support.assert_equal(out, "0.998143 0.074525 0.000000 0 K", "unexpected transformed CMYK value with uppercase K")
 		end,
 	},
 	{
@@ -103,15 +103,15 @@ local tests = {
 		end,
 	},
 	{
-		name = "transform_current_color transforms both fill and stroke cmyk triples",
+		name = "transform_current_color transforms both fill and stroke cmyk",
 		run = function()
 			local cvd = support.load_cvd()
 			cvd.set_type("deuteranopia")
 			cvd.set_severity(1.0)
 			cvd.enable()
 
-			local output = cvd.transform_current_color("0 1 0 k 1 0 0 K")
-			support.assert_match(output, "0%.256394 0%.174226 0%.160300 k 0%.998143 0%.074525 0%.000000 K$", "both fill and stroke CMYK triples should be transformed")
+			local output = cvd.transform_current_color("0 1 0 0 k 1 0 0 0 K")
+			support.assert_match(output, "0%.256394 0%.174226 0%.160300 0 k 0%.998143 0%.074525 0%.000000 0 K$", "both fill and stroke CMYK values should be transformed")
 		end,
 	},
 	{
@@ -174,8 +174,8 @@ local tests = {
 			cvd.set_severity(1.0)
 			cvd.enable()
 
-			local out = cvd.transform_current_color("0 1 0 k")
-			support.assert_equal(out, "0.140349 0.000000 0.246554 k", "tritanopia should transform cmyk")
+			local out = cvd.transform_current_color("0 1 0 0 k")
+			support.assert_equal(out, "0.140349 0.000000 0.246554 0 k", "tritanopia should transform cmyk")
 		end,
 	},
 	{
