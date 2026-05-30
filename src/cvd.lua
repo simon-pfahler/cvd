@@ -222,8 +222,12 @@ function M.transform_current_color(color_str)
 	-- "1 0 0 rg 1 0 0 RG" in RGB or "1 0 0 0 k 1 0 0 0 K" in CMYK
 	-- Extract just the color model ("rgb" or "cmy") and the corresponding
 	-- channel values R G B or C M Y K (denoted c1, c2, c3, c4 for CMYK where c4=K is kept unchanged)
-	local color_model = (string.match(color_str, "rg") or string.match(color_str, "RG") or 
-	                    string.match(color_str, "k") or string.match(color_str, "K"))
+	local color_model = (
+		string.match(color_str, "rg")
+		or string.match(color_str, "RG")
+		or string.match(color_str, "k")
+		or string.match(color_str, "K")
+	)
 	if color_model == "rg" or color_model == "RG" then
 		color_model = "rgb"
 	elseif color_model == "k" or color_model == "K" then
@@ -253,7 +257,8 @@ function M.transform_current_color(color_str)
 		end
 
 		-- check if there are more values (usually draw) and transform them as well
-		local d1, d2, d3, d4 = string.match(transformed, " +[a-zA-Z]+%s+(%d*%.?%d+)%s+(%d*%.?%d+)%s+(%d*%.?%d+)%s+(%d*%.?%d+)")
+		local d1, d2, d3, d4 =
+			string.match(transformed, " +[a-zA-Z]+%s+(%d*%.?%d+)%s+(%d*%.?%d+)%s+(%d*%.?%d+)%s+(%d*%.?%d+)")
 		if d1 and d2 and d3 and d4 and M.enabled and M.current_type then
 			d1, d2, d3, d4 = tonumber(d1), tonumber(d2), tonumber(d3), tonumber(d4)
 			if not d1 or not d2 or not d3 or not d4 then
@@ -262,9 +267,14 @@ function M.transform_current_color(color_str)
 			-- Transform only C, M, Y components (first 3), keep K component (4th) unchanged
 			local d1_new, d2_new, d3_new = M.transform(color_model, d1, d2, d3)
 			-- Replace the CMYK values in the original string, preserving K
-			transformed = string.gsub(transformed, " +([a-zA-Z]+) +%d*%.?%d+ +%d*%.?%d+ +%d*%.?%d+ +%d*%.?%d+", function(op)
-				return string.format(" %s %.6f %.6f %.6f %s", op, d1_new, d2_new, d3_new, d4)
-			end, 1)
+			transformed = string.gsub(
+				transformed,
+				" +([a-zA-Z]+) +%d*%.?%d+ +%d*%.?%d+ +%d*%.?%d+ +%d*%.?%d+",
+				function(op)
+					return string.format(" %s %.6f %.6f %.6f %s", op, d1_new, d2_new, d3_new, d4)
+				end,
+				1
+			)
 		end
 	else
 		-- RGB color model - 3 values
@@ -329,7 +339,7 @@ function M.process_pdf_image_content(stream)
 
 	-- Transform colors for any of the supported operators
 	-- Match after space or line start, require non-letter after operator to avoid matching to text
-	
+
 	-- Handle CMYK with 4 values (C M Y K) first
 	stream = string.gsub(
 		stream,
@@ -361,7 +371,7 @@ function M.process_pdf_image_content(stream)
 			return prefix .. c1_str .. " " .. c2_str .. " " .. c3_str .. " " .. c4_str .. " " .. op .. suffix
 		end
 	)
-	
+
 	-- Handle RGB with 3 values
 	stream = string.gsub(
 		stream,

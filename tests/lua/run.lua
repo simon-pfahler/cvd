@@ -87,7 +87,11 @@ local tests = {
 			cvd.enable()
 
 			local out = cvd.transform_current_color("1 0 0 0 K")
-			support.assert_equal(out, "0.998143 0.074525 0.000000 0 K", "unexpected transformed CMYK value with uppercase K")
+			support.assert_equal(
+				out,
+				"0.998143 0.074525 0.000000 0 K",
+				"unexpected transformed CMYK value with uppercase K"
+			)
 		end,
 	},
 	{
@@ -111,7 +115,11 @@ local tests = {
 			cvd.enable()
 
 			local output = cvd.transform_current_color("0 1 0 0 k 1 0 0 0 K")
-			support.assert_match(output, "0%.256394 0%.174226 0%.160300 0 k 0%.998143 0%.074525 0%.000000 0 K$", "both fill and stroke CMYK values should be transformed")
+			support.assert_match(
+				output,
+				"0%.256394 0%.174226 0%.160300 0 k 0%.998143 0%.074525 0%.000000 0 K$",
+				"both fill and stroke CMYK values should be transformed"
+			)
 		end,
 	},
 	{
