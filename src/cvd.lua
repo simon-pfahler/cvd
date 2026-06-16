@@ -398,6 +398,14 @@ function M.process_pdf_image_content(stream)
 	-- Transform colors for any of the supported operators
 	-- Match after space or line start, require non-letter after operator to avoid matching to text
 
+	-- TODO: handle the separable color operators scn/SCN. Only the device-color
+	-- operators rg/RG (RGB) and k/K (CMYK) are matched below; spot/separation,
+	-- ICCBased, and pattern colors set via scn/SCN pass through untransformed.
+	-- This is non-trivial: scn/SCN operand counts are variable and depend on the
+	-- color space selected earlier via cs/CS (and an scn may carry a trailing
+	-- pattern name), so it needs color-space tracking rather than a fixed-arity
+	-- pattern. Typical xcolor/TikZ output uses rg/k, so this is a lower-impact gap.
+
 	-- Handle CMYK with 4 values (C M Y K) first.
 	-- The leading delimiter is captured and re-emitted, but the trailing
 	-- boundary after the operator is matched with a zero-width frontier pattern
