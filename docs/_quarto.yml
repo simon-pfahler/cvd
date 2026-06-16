@@ -38,6 +38,7 @@ book:
     - part: User Guide
       chapters:
         - getting-started.md
+        - shadings.md
   appendices:
     - part: Implementation
       chapters:

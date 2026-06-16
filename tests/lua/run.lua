@@ -217,6 +217,73 @@ local tests = {
 		end,
 	},
 	{
+		name = "transform_pgf_rgb transforms shading tuple when enabled",
+		run = function()
+			local cvd = support.load_cvd()
+			cvd.set_type("deuteranopia")
+			cvd.set_severity(1.0)
+			cvd.enable()
+
+			local out = cvd.transform_pgf_rgb("1", "0", "0")
+			support.assert_equal(out, "0.265135 0.420471 0.000000", "unexpected transformed shading rgb tuple")
+		end,
+	},
+	{
+		name = "transform_pgf_rgb disabled returns original tuple",
+		run = function()
+			local cvd = support.load_cvd()
+			cvd.set_type("deuteranopia")
+			cvd.set_severity(1.0)
+			cvd.disable()
+
+			support.assert_equal(cvd.transform_pgf_rgb("1", "0", "0"), "1 0 0", "disabled state should not transform")
+		end,
+	},
+	{
+		name = "transform_pgf_cmyk transforms tuple and preserves K",
+		run = function()
+			local cvd = support.load_cvd()
+			cvd.set_type("deuteranopia")
+			cvd.set_severity(1.0)
+			cvd.enable()
+
+			local out = cvd.transform_pgf_cmyk("0", "1", "0", "0.5")
+			support.assert_equal(out, "0.256394 0.174226 0.160300 0.5", "unexpected transformed shading cmyk tuple")
+		end,
+	},
+	{
+		name = "transform_pgf_cmyk disabled returns original tuple",
+		run = function()
+			local cvd = support.load_cvd()
+			cvd.set_type("deuteranopia")
+			cvd.set_severity(1.0)
+			cvd.disable()
+
+			support.assert_equal(
+				cvd.transform_pgf_cmyk("0", "1", "0", "0.5"),
+				"0 1 0 0.5",
+				"disabled state should not transform"
+			)
+		end,
+	},
+	{
+		name = "transform_pgf_rgb passes unparseable component through unchanged",
+		run = function()
+			local cvd = support.load_cvd()
+			cvd.set_type("deuteranopia")
+			cvd.set_severity(1.0)
+			cvd.enable()
+
+			-- A non-numeric component must not be coerced to 0 (which would emit
+			-- a wrong color); the original strings pass through untouched.
+			support.assert_equal(
+				cvd.transform_pgf_rgb("1", "bogus", "0"),
+				"1 bogus 0",
+				"unparseable component should not be transformed"
+			)
+		end,
+	},
+	{
 		name = "transform_current_color disabled returns unchanged",
 		run = function()
 			local cvd = support.load_cvd()

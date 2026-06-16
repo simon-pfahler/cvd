@@ -1,0 +1,88 @@
+\input{regression-test.tex}
+\documentclass{minimal}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{cvd}
+
+\START
+
+\makeatletter
+
+\TEST{pgf~rgb~shading~tuple~under~deuteranopia}{
+  \cvdtype{deuteranopia}
+  \cvdseverity{1.0}
+  \cvdenable
+  \pgf@getrgbtuplewithmixin{1}{0}{0}
+  \TYPE{rgb:~\pgf@rgb}
+  \cvddisable
+}
+
+\TEST{pgf~cmyk~shading~tuple~preserves~K}{
+  \cvdtype{deuteranopia}
+  \cvdseverity{1.0}
+  \cvdenable
+  \pgf@getcmyktuplewithmixin{0}{1}{0}{0.5}
+  \TYPE{cmyk:~\pgf@cmyk}
+  \cvddisable
+}
+
+\TEST{pgf~rgb~shading~tuple~unchanged~when~disabled}{
+  \cvddisable
+  \pgf@getrgbtuplewithmixin{1}{0}{0}
+  \TYPE{rgb:~\pgf@rgb}
+}
+
+% The system-layer record (\pgf@sys@rgb, brace-grouped) is used by the dvisvgm
+% driver and must stay in sync with \pgf@rgb. Verify it is transformed too.
+\TEST{pgf~sys@rgb~record~transformed~under~deuteranopia}{
+  \cvdtype{deuteranopia}
+  \cvdseverity{1.0}
+  \cvdenable
+  \pgf@getrgbtuplewithmixin{1}{0}{0}
+  \TYPE{sys~rgb:~\pgf@sys@rgb}
+  \pgf@getcmyktuplewithmixin{0}{1}{0}{0.5}
+  \TYPE{sys~cmyk:~\pgf@sys@cmyk}
+  \cvddisable
+}
+
+% The tests above exercise the patched leaf emitters in isolation. The tests
+% below drive pgf's full shading-construction path: \pgf@parsefunc is what the
+% LuaTeX driver (\pgfsys@horishading/@vertshading/@radialshading) calls to build
+% the PDF /Function dictionary that becomes /C0 and /C1 in the emitted /Shading
+% object. Inspecting \pgf@pdfparsedfunction is therefore equivalent to grepping
+% the emitted shading object, but deterministic. Axial and radial shadings share
+% this path, so one axial case covers both. A regression in the wiring (pgf
+% renaming \pgf@getrgb@@, or the patch failing to apply) flips these results
+% back to the untransformed colors and fails the test.
+
+\TEST{rgb~axial~shading~function~under~deuteranopia}{
+  \cvdtype{deuteranopia}
+  \cvdseverity{1.0}
+  \cvdenable
+  \pgf@setup@shading@model
+  \pgf@parsefunc{rgb(0bp)=(1,0,0); rgb(10bp)=(0,0,1)}
+  \TYPE{func:~\pgf@pdfparsedfunction}
+  \cvddisable
+}
+
+\TEST{cmyk~axial~shading~function~preserves~K}{
+  \cvdtype{deuteranopia}
+  \cvdseverity{1.0}
+  \cvdenable
+  \def\pgf@shading@model{cmyk}
+  \def\pgf@shading@device{/DeviceCMYK}
+  \pgf@parsefunc{cmyk(0bp)=(0,1,0,0.5); cmyk(10bp)=(1,0,0,0.25)}
+  \TYPE{func:~\pgf@pdfparsedfunction}
+  \cvddisable
+}
+
+\TEST{rgb~axial~shading~function~unchanged~when~disabled}{
+  \cvddisable
+  \pgf@setup@shading@model
+  \pgf@parsefunc{rgb(0bp)=(1,0,0); rgb(10bp)=(0,0,1)}
+  \TYPE{func:~\pgf@pdfparsedfunction}
+}
+
+\makeatother
+
+\END
