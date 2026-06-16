@@ -1,6 +1,15 @@
 local M = {}
 
-function M.install_tex_stubs()
+-- Records the (name -> value) pairs passed to token.set_macro since the last
+-- install_tex_stubs, so tests can observe macros set by e.g. set_pgf_rgb.
+M.set_macros = {}
+
+-- Install the minimal TeX/LuaTeX globals cvd.lua expects when loaded outside a
+-- real LuaTeX run. `opts.status` fields are merged over the defaults, letting a
+-- test flip e.g. shell_escape or output_directory without affecting others.
+function M.install_tex_stubs(opts)
+	opts = opts or {}
+
 	_G.texio = {
 		write_nl = function()
 			return nil
@@ -13,7 +22,12 @@ function M.install_tex_stubs()
 		end,
 	}
 
-	_G.status = { shell_escape = 0 }
+	local status = { shell_escape = 0 }
+	for key, value in pairs(opts.status or {}) do
+		status[key] = value
+	end
+	_G.status = status
+
 	_G.luatexbase = {
 		add_to_callback = function()
 			return nil
@@ -24,15 +38,17 @@ function M.install_tex_stubs()
 			return nil
 		end,
 	}
+
+	M.set_macros = {}
 	_G.token = {
-		set_macro = function()
-			return nil
+		set_macro = function(name, value)
+			M.set_macros[name] = value
 		end,
 	}
 end
 
-function M.load_cvd()
-	M.install_tex_stubs()
+function M.load_cvd(opts)
+	M.install_tex_stubs(opts)
 	return dofile("src/cvd.lua")
 end
 
@@ -58,6 +74,20 @@ function M.assert_not_match(value, pattern, message)
 	if string.match(value, pattern) then
 		error((message or "assert_not_match failed") .. string.format("\npattern: %q\nvalue:   %q", pattern, value), 0)
 	end
+end
+
+-- Assert that calling fn raises an error. When `pattern` is given, the raised
+-- message must also match it. Returns the captured error message.
+function M.assert_error(fn, pattern, message)
+	local ok, err = pcall(fn)
+	if ok then
+		error((message or "assert_error failed") .. "\nexpected an error but none was raised", 0)
+	end
+	err = tostring(err)
+	if pattern and not string.match(err, pattern) then
+		error((message or "assert_error failed") .. string.format("\npattern: %q\nmessage: %q", pattern, err), 0)
+	end
+	return err
 end
 
 function M.assert_unchanged(input, output, message)

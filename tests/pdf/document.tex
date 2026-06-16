@@ -1,0 +1,15 @@
+%! TEX program = luatex
+% Embeds figure.pdf under a protanopia transform so the real
+% process_pdf_image_content callback rewrites the embedded image's colour
+% operators. PDF compression is disabled so the resulting content stream is
+% plain text and check.sh can inspect it without qpdf/mutool.
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage[protanopia]{cvd}
+\cvdtype{protanopia}
+\cvdseverity{1.0}
+\pdfvariable compresslevel 0
+\pdfvariable objcompresslevel 0
+\begin{document}
+\includegraphics[width=4cm]{figure.pdf}
+\end{document}

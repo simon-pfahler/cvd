@@ -33,6 +33,9 @@ jobs:
       - name: lua tests
         run: devenv shell task test-lua
 
+      - name: pdf end-to-end test
+        run: devenv shell task test-pdf
+
       - name: document
         run: devenv shell l3build-wrapped doc
 

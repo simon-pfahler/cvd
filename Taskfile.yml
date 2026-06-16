@@ -37,6 +37,7 @@ tasks:
     desc: Run the test suite, checking package functionality
     cmds:
       - task test-lua
+      - task test-pdf
       - l3build-wrapped check
 
   test-lua:
@@ -44,6 +45,17 @@ tasks:
     cmds:
       - texlua tests/lua/run.lua
       - texlua tests/lua/parsing.lua
+      - texlua tests/lua/validation.lua
+      - texlua tests/lua/color-math.lua
+      - texlua tests/lua/pdf-stream.lua
+      - texlua tests/lua/shading-macros.lua
+      - texlua tests/lua/imagemagick.lua
+
+  test-pdf:
+    desc: End-to-end test that CVD transforms colour operators in embedded PDF images
+    cmds:
+      - l3build-wrapped unpack -q
+      - bash tests/pdf/check.sh
 
   ctan:
     desc: Prepare the package for CTAN submission

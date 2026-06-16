@@ -398,11 +398,17 @@ function M.process_pdf_image_content(stream)
 	-- Transform colors for any of the supported operators
 	-- Match after space or line start, require non-letter after operator to avoid matching to text
 
-	-- Handle CMYK with 4 values (C M Y K) first
+	-- Handle CMYK with 4 values (C M Y K) first.
+	-- The leading delimiter is captured and re-emitted, but the trailing
+	-- boundary after the operator is matched with a zero-width frontier pattern
+	-- (%f) rather than consumed. This leaves the delimiter in place so an
+	-- immediately following stroke operator (e.g. "... k 0 1 0 0.3 K", as pgf
+	-- emits) still has a leading delimiter to match against. Operand separators
+	-- use %s+ so multiple spaces/newlines between values are handled.
 	stream = string.gsub(
 		stream,
-		"([^a-zA-Z%d.])(%d*%.?%d+)%s(%d*%.?%d+)%s(%d*%.?%d+)%s(%d*%.?%d+)%s([kK])([^a-zA-Z%d.])",
-		function(prefix, c1, c2, c3, c4, op, suffix)
+		"([^a-zA-Z%d.])(%d*%.?%d+)%s+(%d*%.?%d+)%s+(%d*%.?%d+)%s+(%d*%.?%d+)%s+([kK])%f[^a-zA-Z%d.]",
+		function(prefix, c1, c2, c3, c4, op)
 			local color_model = "cmy"
 			local c1_str, c2_str, c3_str, c4_str = c1, c2, c3, c4
 			c1, c2, c3 = tonumber(c1), tonumber(c2), tonumber(c3)
@@ -413,28 +419,29 @@ function M.process_pdf_image_content(stream)
 					and math.abs(c2_new - c2) < 0.000001
 					and math.abs(c3_new - c3) < 0.000001
 				then
-					return prefix .. c1_str .. " " .. c2_str .. " " .. c3_str .. " " .. c4_str .. " " .. op .. suffix
+					return prefix .. c1_str .. " " .. c2_str .. " " .. c3_str .. " " .. c4_str .. " " .. op
 				end
 				return string.format(
-					"%s%s %s %s %s %s%s",
+					"%s%s %s %s %s %s",
 					prefix,
 					format_short(c1_new),
 					format_short(c2_new),
 					format_short(c3_new),
 					c4_str,
-					op,
-					suffix
+					op
 				)
 			end
-			return prefix .. c1_str .. " " .. c2_str .. " " .. c3_str .. " " .. c4_str .. " " .. op .. suffix
+			return prefix .. c1_str .. " " .. c2_str .. " " .. c3_str .. " " .. c4_str .. " " .. op
 		end
 	)
 
-	-- Handle RGB with 3 values
+	-- Handle RGB with 3 values. Same frontier/whitespace handling as the CMYK
+	-- branch above so adjacent "... rg 1 0 0 RG" pairs and multi-space operand
+	-- separators are both transformed.
 	stream = string.gsub(
 		stream,
-		"([^a-zA-Z%d.])(%d*%.?%d+)%s(%d*%.?%d+)%s(%d*%.?%d+)%s([rR][gG])([^a-zA-Z%d.])",
-		function(prefix, c1, c2, c3, op, suffix)
+		"([^a-zA-Z%d.])(%d*%.?%d+)%s+(%d*%.?%d+)%s+(%d*%.?%d+)%s+([rR][gG])%f[^a-zA-Z%d.]",
+		function(prefix, c1, c2, c3, op)
 			local color_model = "rgb"
 			local c1_str, c2_str, c3_str = c1, c2, c3
 			c1, c2, c3 = tonumber(c1), tonumber(c2), tonumber(c3)
@@ -445,19 +452,18 @@ function M.process_pdf_image_content(stream)
 					and math.abs(c2_new - c2) < 0.000001
 					and math.abs(c3_new - c3) < 0.000001
 				then
-					return prefix .. c1_str .. " " .. c2_str .. " " .. c3_str .. " " .. op .. suffix
+					return prefix .. c1_str .. " " .. c2_str .. " " .. c3_str .. " " .. op
 				end
 				return string.format(
-					"%s%s %s %s %s%s",
+					"%s%s %s %s %s",
 					prefix,
 					format_short(c1_new),
 					format_short(c2_new),
 					format_short(c3_new),
-					op,
-					suffix
+					op
 				)
 			end
-			return prefix .. c1_str .. " " .. c2_str .. " " .. c3_str .. " " .. op .. suffix
+			return prefix .. c1_str .. " " .. c2_str .. " " .. c3_str .. " " .. op
 		end
 	)
 

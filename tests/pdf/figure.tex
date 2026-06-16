@@ -1,0 +1,17 @@
+%! TEX program = luatex
+% Figure embedded by document.tex for the end-to-end PDF test. Each path makes
+% pgf emit an adjacent fill+stroke colour pair ("c c c rg c c c RG"), the exact
+% byte layout that previously left stroke colours untransformed. Covers RGB fill,
+% RGB stroke, and a CMYK fill (with a non-zero K to check K is preserved).
+\documentclass{standalone}
+\usepackage{tikz}
+\begin{document}
+\begin{tikzpicture}
+  \definecolor{cvdred}{rgb}{1,0,0}
+  \definecolor{cvdgreen}{rgb}{0,1,0}
+  \definecolor{cvdcmyk}{cmyk}{0,1,0,0.3}
+  \fill[cvdred] (0,0) rectangle (1,1);
+  \draw[line width=2pt, cvdgreen] (1.5,0) rectangle (2.5,1);
+  \fill[cvdcmyk] (3,0) rectangle (4,1);
+\end{tikzpicture}
+\end{document}
