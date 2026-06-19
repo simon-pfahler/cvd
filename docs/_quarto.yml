@@ -38,7 +38,15 @@ book:
     - part: User Guide
       chapters:
         - getting-started.md
+        - usage.md
+        - commands.md
+        - images.md
+        - examples.md
         - shadings.md
+        - limitations.md
+    - part: Background
+      chapters:
+        - theory.md
   appendices:
     - part: Implementation
       chapters:
