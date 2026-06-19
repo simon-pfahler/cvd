@@ -19,6 +19,7 @@ book:
   image: images/og.jpg
   author:
     - name: "Johan Larsson"
+    - name: "Simon Pfahler"
   date: today
 
   repo-url: "https://github.com/jolars/cvd"
@@ -28,7 +29,7 @@ book:
   search: true
 
   page-footer:
-    left: "cvd v{{< meta version >}} | Copyright 2026, Johan Larsson"
+    left: "cvd v{{< meta version >}} | Copyright 2026, Johan Larsson, Simon Pfahler"
     right:
       - icon: github
         href: "https://github.com/jolars/cvd"
