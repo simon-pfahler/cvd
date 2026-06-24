@@ -69,7 +69,7 @@ The cache stores:
 
 This also means that subsequent compilations are faster, as images only need to be transformed once per CVD settings.
 
-## Alternative: \cvdincludegraphics
+## Alternative: `\cvdincludegraphics`
 
 The `\cvdincludegraphics` command provides explicit control over CVD transformation for raster images:
 
@@ -120,6 +120,6 @@ When transforming PDF content streams, significant growth may cause truncation o
    lualatex --shell-escape mydocument.tex
    ```
 
-4. **Use \cvdincludegraphics for specific images** when you want to apply CVD transformation to select raster images without enabling global raster conversion
+4. **Use `\cvdincludegraphics` for specific images** when you want to apply CVD transformation to select raster images without enabling global raster conversion
 
 5. **Pre-compute colors for complex graphics** — When working with shadings and gradients, use `\cvddefinecolor` to create pre-computed colors (see [Shadings](shadings.md))
