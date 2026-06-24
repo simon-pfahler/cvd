@@ -1,6 +1,6 @@
 # Theory: Color Vision Deficiency Simulation
 
-This page explains the mathematical foundation behind how the `cvd` package simulates color vision deficiencies. Understanding this theory helps you appreciate how the transformations work and why they produce realistic simulations of color blindness. This is based on ["A Physiologically-based Model for Simulation of Color Vision Deﬁciency"](doi.org/10.1109/TVCG.2009.113) by Gustavo M. Machado, Manuel M. Oliveira.
+This page explains the mathematical foundation behind how the `cvd` package simulates color vision deficiencies. Understanding this theory helps you appreciate how the transformations work and why they produce realistic simulations of color blindness. This is based on [@Machado_2009].
 
 ## Overview
 
@@ -134,4 +134,4 @@ The simulation methodology is based on established color vision science and impl
 
 An implementation of the described pipeline of creating the 3x3 transformation matrices is implemented in [simon-pfahler/simon-pfahler/CVD-simulation-generator](https://github.com/simon-pfahler/CVD-simulation-generator).
 
-For more details on the mathematical foundations, ["A Physiologically-based Model for Simulation of Color Vision Deﬁciency"](https://doi.org/10.1109/TVCG.2009.113) by Gustavo M. Machado, Manuel M. Oliveira.
+For more details on the mathematical foundations, see [@Machado_2009].

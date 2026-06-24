@@ -2,6 +2,9 @@ project:
   type: book
   output-dir: _site
 
+bibliography: references.bib
+citation-style: authoryear
+
 book:
   title: "cvd"
   subtitle: "A LaTeX Package for Simulating Color Vision Deficiency"
