@@ -18,6 +18,7 @@ For a given CVD type, we first obtain adjusted cone sensitivities. The human eye
 - **S cones** (Short wavelength) - most sensitive to blue
 
 The adjusted sensitivities account for:
+
 - **Cone shift** ($\Delta\lambda_S \in [0,60]$) for S cone cells
 - **Severity factors** ($\alpha_L, \alpha_M \in [0,1]$) for protanopia and deuteranopia
 
