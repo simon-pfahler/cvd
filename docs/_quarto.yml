@@ -74,6 +74,10 @@ format:
     colorlinks: true
     include-in-header:
       text: |
+        % KOMA-Script's captions=tableheading runs the caption counter on
+        % longtables even when captionless; Pandoc emits those as
+        % \def\LTcaptype{none}, so define a 'none' counter to step into.
+        \newcounter{none}
         \usepackage{xspace}
         \usepackage{parskip}
         \usepackage{doc}
