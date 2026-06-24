@@ -49,7 +49,7 @@ jobs:
       - name: Restore timestamps
         uses: chetan/git-restore-mtime-action@v2
 
-      - uses: leafo/gh-actions-lua@v12
+      - uses: leafo/gh-actions-lua@v13
 
       - name: Install pandoc
         uses: pandoc/actions/setup@v1
