@@ -1,6 +1,6 @@
 # Package Options
 
-The behavior of the CVD simulation is configured through package options. These options apply to the entire document or until they are changed later using the commands described in [Commands](commands.md).
+The behavior of the CVD simulation is configured through package options. These options apply to the entire document or until they are changed later using the commands described in @sec-commands.
 
 ## CVD Type Options
 
@@ -53,4 +53,4 @@ For more control, you can specify the type and severity explicitly:
 - Preset options (`protanopia`, `deuteranopia`, etc.) override individual `type` and `severity` settings
 - If both a preset and individual options are specified, the preset takes precedence
 - Graphics options are independent of CVD type and severity settings
-- Options can be changed mid-document using the commands in [Commands](commands.md)
+- Options can be changed mid-document using the commands in @sec-commands

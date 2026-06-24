@@ -1,4 +1,4 @@
-# Commands
+# Commands {#sec-commands}
 
 The `cvd` package provides several commands to control the CVD simulation at any point in your document. These commands allow you to enable, disable, and configure the simulation dynamically.
 
@@ -98,7 +98,7 @@ Define a new color named `<target color>` by applying the current CVD transforma
 
 The optional `<options>` argument can be used to override the current CVD settings (e.g., `type`, `severity`) for this specific color definition, using the same syntax as `\cvdset`.
 
-This is particularly useful for creating pre-computed CVD colors that can be used consistently throughout your document, especially with shadings and gradients (see [Shadings](shadings.md)).
+This is particularly useful for creating pre-computed CVD colors that can be used consistently throughout your document, especially with shadings and gradients (see @sec-shadings).
 
 Example:
 ```latex

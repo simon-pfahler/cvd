@@ -122,4 +122,4 @@ When transforming PDF content streams, significant growth may cause truncation o
 
 4. **Use `\cvdincludegraphics` for specific images** when you want to apply CVD transformation to select raster images without enabling global raster conversion
 
-5. **Pre-compute colors for complex graphics** — When working with shadings and gradients, use `\cvddefinecolor` to create pre-computed colors (see [Shadings](shadings.md))
+5. **Pre-compute colors for complex graphics** — When working with shadings and gradients, use `\cvddefinecolor` to create pre-computed colors (see @sec-shadings)

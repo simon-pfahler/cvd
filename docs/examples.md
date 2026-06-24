@@ -166,7 +166,7 @@ If the colors become hard to distinguish, consider changing them until they can 
 
 ### Multiple Gradients with Different CVD Types
 
-See the [Shadings](shadings.md) page for detailed examples on handling shadings with different CVD types, including the caching workaround.
+See @sec-shadings for detailed examples on handling shadings with different CVD types, including the caching workaround.
 
 ## Raster Images
 
