@@ -204,15 +204,15 @@ Raster image (PNG/JPG) transformation requires compiling with \texttt{--shell-es
 Without these, raster images pass through untransformed.
 
 \subsection{PDF/Vector Graphics Limitations}
-\begin{itemize}
-	\item \textbf{Functional shadings} (\verb|\pgfdeclarefunctionalshading|, ShadingType~1) pass through unchanged as their colors are embedded in PostScript Type~4 functions.
-	\item \textbf{Cached duplicate shadings:} pgf caches shadings, so changing CVD settings between identical \verb|\shade| calls has no effect.
+\begin{description}
+	\item[Functional shadings] (\verb|\pgfdeclarefunctionalshading|, ShadingType~1) pass through unchanged as their colors are embedded in PostScript Type~4 functions.
+	\item[Cached duplicate shadings] pgf caches shadings, so changing CVD settings between identical \verb|\shade| calls has no effect.
 	      Workaround: use \verb|\cvddefinecolor| to create unique color names for each CVD variant.
-	\item \textbf{scn/SCN color operators:} Spot/separation colors, ICCBased colors, and pattern colors are not transformed. Only device-color operators \texttt{rg/RG} (RGB) and \texttt{k/K} (CMYK) are supported.
-	\item \textbf{PDF stream length:} When transforming PDF content streams, significant growth may cause truncation or rendering issues in some PDF viewers.
+	\item[scn/SCN color operators] Spot/separation colors, ICCBased colors, and pattern colors are not transformed. Only device-color operators \texttt{rg/RG} (RGB) and \texttt{k/K} (CMYK) are supported.
+	\item[PDF stream length] When transforming PDF content streams, significant growth may cause truncation or rendering issues in some PDF viewers.
 	      Mitigation: use raster formats for complex PDFs, or split into multiple documents.
 	      When a significant growth of the PDF stream is detected, a warning for this is issued.
-\end{itemize}
+\end{description}
 
 \section{Implementation}
 
