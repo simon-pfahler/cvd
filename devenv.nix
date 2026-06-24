@@ -19,6 +19,7 @@ let
       pgf
       pgfopts
       setspace
+      standalone
       xurl
       microtype
       koma-script
