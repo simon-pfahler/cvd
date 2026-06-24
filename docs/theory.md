@@ -13,6 +13,7 @@ The CVD simulation follows a systematic six-step process:
 ### Step 1: Adjusted Cone Sensitivities
 
 For a given CVD type, we first obtain adjusted cone sensitivities. The human eye has three types of cone cells:
+
 - **L cones** (Long wavelength) - most sensitive to red
 - **M cones** (Medium wavelength) - most sensitive to green
 - **S cones** (Short wavelength) - most sensitive to blue
@@ -31,6 +32,7 @@ S_a(\lambda) &= S(\lambda + \Delta\lambda_S)
 \end{align*}$$
 
 Where:
+
 - $L(\lambda), M(\lambda), S(\lambda)$ are the original cone sensitivity functions
 - $L_a(\lambda), M_a(\lambda), S_a(\lambda)$ are the adjusted sensitivity functions
 - $\alpha_L, \alpha_M$ control the severity (0 = normal vision, 1 = full colorblindness)
@@ -40,6 +42,7 @@ Where:
 ### Step 2: Opponent-Color-Model Basis Functions
 
 Human color vision can be understood via opponent color theory, where colors are perceived through opposing pairs:
+
 - **White-Black (Luminance)** - WS
 - **Yellow-Blue** - YB
 - **Red-Green** - RG
@@ -59,6 +62,7 @@ This matrix transformation converts from cone space to the opponent color space 
 For each color channel in the color model (e.g., R, G, B in RGB), we obtain the spectral power distributions $\varphi_C(\lambda)$. These describe how much light of each wavelength is emitted or reflected by a color.
 
 The spectral power distributions depend on the color model:
+
 - **RGB**: Based on monitor characteristics
 - **CMYK**: Based on printer ink and paper characteristics
 - **Other models**: Converted to RGB/CMYK first
@@ -118,6 +122,7 @@ $$\begin{align*}
 \end{align*}$$
 
 Where:
+
 - $\vec C$ are the original color values (e.g., $(r,g,b)$)
 - $T$ is the transformation matrix for the CVD being simulated
 - $T_{\textrm{normal}}$ is the transformation matrix for normal vision
